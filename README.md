@@ -33,8 +33,18 @@ Dans cette partie, vous allez récupérer le script Python [manual-decryption.py
 - Exécuter le script avec `python manual-decryption.py`
    
 - Comparer la sortie du script avec la capture text déchiffrée par Wireshark
+
+cassandre@debian-cass:~/Documents/SWI/HEIGVD-SWI21-Labo1-WEP/files$ python3 manual-decryption.py 
+Text: aaaa03000000080600010800060400019027e4ea61f2c0a80164000000000000c0a801c8
+icv:  cc88cbb2
+icv(num): (3431517106,)
+
+Le texte est identique entre celui fourni par la commande et celui déchiffré directement dans wireshark. L'ICV affiché par la commande est l'ICV déchiffré et celui que Wireshark affiche est chiffré. 
    
 - Analyser le fonctionnement du script
+
+Le script lit le fichier .cap et récupérer le premier paquet. On calcule la graine RC4 avec le vecteur d'initialisation et la clé. On récupére ensuite l'ICV chiffré puis le message complet chiffré. 
+On déchiffre le message complet chiffré en RC4 avec la seed comme clé. Les 4 derniers bytes du message en clair correspondent à l'ICV déchiffré, elles sont donc stockées dans une variable et on les supprime du message en clair. 
 
 ### 2. Chiffrement manuel de WEP
 

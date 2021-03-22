@@ -46,7 +46,7 @@ icv(num): (3431517106,)
 
 > Résultat donné par Wireshark : 
 
-![](\SWI_ex1_right.png)
+![](SWI_ex1_right.png)
 
 Le corps du message est identique entre celui déchiffré par la commande et celui déchiffré directement dans `wireshark`. L'ICV affiché par la commande est déchiffré et celui que `wireshark` affiche est chiffré, d'où la différence. 
 
@@ -73,7 +73,7 @@ Sur la capture d'écran ci-dessous, on peut constater que le fichier `test.cap` 
 
 La trame créée dans notre script `manual-encryption.py` est donc bien reconnue par `wireshark` comme une trame `arp` et est correctement déchiffrée avec la clé. 
 
-![](\SWI_ex2.png)
+![](SWI_ex2.png)
 
 
 ### 3. Fragmentation

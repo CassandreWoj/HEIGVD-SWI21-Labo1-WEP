@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-""" Manually decrypt a wep message given the WEP key"""
+""" Manually encrypts a wep message given the WEP key"""
 
 __author__ = "Abraham Rubinstein, Cassandre Wojciechowski, Gabriel Roch"
 __copyright__ = "Copyright 2017, 2021, HEIG-VD"
@@ -30,7 +30,7 @@ def ieee_gen(payload, key):
     @return: le packet créer
     """
 
-    # lecture de message chiffré - rdpcap retourne toujours un array, même si la capture contient un seul paquet
+    # lecture de message chiffré
     arp = rdpcap('arp.cap')[0]
 
     # rc4 seed est composé de IV+clé
@@ -39,7 +39,7 @@ def ieee_gen(payload, key):
     # Calcul de ICV
     icv = zlib.crc32(payload)
 
-    # chiffrement rc4
+    # chiffrement rc4 et recomposition de la payload avec l'ICV concaténé
     cipher = RC4(seed, streaming=False)
     payload_with_icv = payload + icv.to_bytes(4, byteorder='little')
     payload_with_icv = cipher.crypt(payload_with_icv)
@@ -48,7 +48,7 @@ def ieee_gen(payload, key):
     arp.wepdata = payload_with_icv[:-4]
     arp.icv = int.from_bytes(payload_with_icv[-4:], 'big')
 
-    # Remets la taille du paquet à zéro.
+    # Remet la taille du paquet à zéro.
     arp[RadioTap].len = None
 
     return arp

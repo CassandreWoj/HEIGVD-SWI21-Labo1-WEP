@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-""" Manually decrypt a wep message given the WEP key"""
+""" Manually fragments and encrypts a wep message given the WEP key"""
 
 __author__ = "Abraham Rubinstein, Cassandre Wojciechowski, Gabriel Roch"
 __copyright__ = "Copyright 2017, 2021, HEIG-VD"
@@ -23,21 +23,23 @@ key = b'\xaa\xaa\xaa\xaa\xaa'
 nb_fragm = 3
 fragements = [0] * nb_fragm
 frag_no = 0
+
+# Fragmentation de la payload en plusieurs paquets et chiffrement de chaque fragment 
 for i in range(0, len(new_payload), int(len(new_payload) / nb_fragm)):
     e = int(i + len(new_payload) / nb_fragm)
 
-    # obtient un packet chiffrer pour fragment de payload
+    # Obtiention d'un paquet chiffré pour chaque fragment de payload
     fragements[frag_no] = ieee_gen(new_payload[i:e], key)
 
-    # More fragment = 1
+    # Mise a jour du flag More fragment = 1
     fragements[frag_no].FCfield |= 0x04
 
-    # Compteur de fragement
+    # Mise a jour du compteur de fragment
     fragements[frag_no].SC = frag_no
 
     frag_no += 1
 
-# More fragment = 0
+# Mise a jour du flag More fragment = 0 pour le dernier fragment
 fragements[frag_no - 1].FCfield &= ~0x04
 
 wrpcap("test.cap", fragements)

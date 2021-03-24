@@ -92,9 +92,7 @@ La trame créée dans notre script `manual-encryption.py` est donc bien reconnue
 
 ![](images/SWI_ex3.png)
 
-Sur la capture d'écran ci-dessus, nous constatons que la trame a été découpé en trois fragments, et le flag `More fragments` du second fragment indique bien 1. 
-
-Les trois fragments sont bien déchiffrés comme on le souhaite. 
+Sur la capture d'écran ci-dessus, nous constatons que la trame a été découpé en trois fragments, et le 3ème fragment est bien la trame complète recomposée : `wireshark` reconnait la trame ARP en tant que telle. 
 
 ## Livrables
 

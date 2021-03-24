@@ -3,15 +3,14 @@
 
 """ Manually decrypt a wep message given the WEP key"""
 
-__author__ = "Abraham Rubinstein"
-__copyright__ = "Copyright 2017, HEIG-VD"
+__author__ = "Abraham Rubinstein, Cassandre Wojciechowski, Gabriel Roch"
+__copyright__ = "Copyright 2017, 2021, HEIG-VD"
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.1"
 __email__ = "abraham.rubinstein@heig-vd.ch"
 __status__ = "Prototype"
 
 from scapy.all import *
-# import binascii
 from rc4 import RC4
 import zlib
 
@@ -37,13 +36,20 @@ def ieee_gen(payload, key):
     # rc4 seed est composé de IV+clé
     seed = arp.iv + key
 
+    # Calcul de ICV
+    icv = zlib.crc32(payload)
+
     # chiffrement rc4
     cipher = RC4(seed, streaming=False)
-    icv = zlib.crc32(payload)
     payload_with_icv = payload + icv.to_bytes(4, byteorder='little')
     payload_with_icv = cipher.crypt(payload_with_icv)
+
+    # Met à jour le paquet
     arp.wepdata = payload_with_icv[:-4]
     arp.icv = int.from_bytes(payload_with_icv[-4:], 'big')
+
+    # Remets la taille du paquet à zéro.
+    arp.[RadioTap].len = None
 
     return arp
 

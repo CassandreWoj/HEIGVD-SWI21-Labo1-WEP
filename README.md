@@ -46,7 +46,7 @@ icv(num): (3431517106,)
 
 > Résultat donné par Wireshark : 
 
-![](SWI_ex1_right.png)
+![](images/SWI_ex1_right.png)
 
 Le corps du message est identique entre celui déchiffré par la commande et celui déchiffré directement dans `wireshark`. L'ICV affiché par la commande est déchiffré et celui que `wireshark` affiche est chiffré, d'où la différence. 
 
@@ -73,7 +73,7 @@ Sur la capture d'écran ci-dessous, on peut constater que le fichier `test.cap` 
 
 La trame créée dans notre script `manual-encryption.py` est donc bien reconnue par `wireshark` comme une trame `arp` et est correctement déchiffrée avec la clé. 
 
-![](SWI_ex2.png)
+![](images/SWI_ex2.png)
 
 
 ### 3. Fragmentation
@@ -89,6 +89,12 @@ La trame créée dans notre script `manual-encryption.py` est donc bien reconnue
 - **Pour vérifier que cette partie fonctionne, vous pouvez importer vos fragments dans Wireshark, qui doit être capable de les recomposer**
 - **Pour un test encore plus intéressant (optionnel), vous pouvez utiliser un AP (disponible sur demande) et envoyer vos fragments. Pour que l’AP accepte vos données injectées, il faudra faire une « fake authentication » que vous pouvez faire avec `aireplay-ng`**
 - **Si l’AP accepte vos fragments, il les recomposera et les retransmettra en une seule trame non-fragmentée !**
+
+![](images/SWI_ex3.png)
+
+Sur la capture d'écran ci-dessus, nous constatons que la trame a été découpé en trois fragments, et le flag `More fragments` du second fragment indique bien 1. 
+
+Les trois fragments sont bien déchiffrés comme on le souhaite. 
 
 ## Livrables
 

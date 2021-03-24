@@ -13,6 +13,7 @@ __status__ 		= "Prototype"
 from scapy.all import *
 import binascii
 from rc4 import RC4
+from manual_generator import ieee_gen
 import zlib
 
 #Nouveau payload
@@ -49,30 +50,48 @@ frag_no = 0
 print(len(new_payload)/nb_fragm)
 for i in range(0, len(new_payload), int(len(new_payload)/nb_fragm)):
     e = int(i+len(new_payload)/nb_fragm)
-    fragment_payload = new_payload[i:e]
 
-    arp.FCfield |= 0x04
-    icv_pre_calc = zlib.crc32(fragment_payload)
-    new_fragment_payload = fragment_payload + icv_pre_calc.to_bytes(4, byteorder='little');
-    new_fragment_payload = cipher.crypt(new_fragment_payload)
-    arp.wepdata = new_fragment_payload[:-4]
-    arp.icv = int.from_bytes(new_fragment_payload[-4:], 'big')
-    # print(frag_no)
-    print(hex(int.from_bytes(new_fragment_payload[:-4], byteorder='big')),
-          hex(int.from_bytes(new_fragment_payload[-4:], byteorder='big')))
-    fragements[frag_no] = arp.copy()
+    # obtient un packet chiffrer pour fragment de payload
+    fragements[frag_no] = ieee_gen(new_payload[i:e], key)
+
+    # More fragment = 1
+    fragements[frag_no].FCfield |= 0x04
+
+    # Compteur de fragement
+    fragements[frag_no].SC = frag_no
+
     frag_no += 1
-    arp.SC += 1
 
-    pass
+# More fragment = 0
+fragements[frag_no-1].FCfield &= ~0x04
+
+
+# for i in range(0, len(new_payload), int(len(new_payload)/nb_fragm)):
+#     e = int(i+len(new_payload)/nb_fragm)
+#     fragment_payload = new_payload[i:e]
+#
+#     arp.FCfield |= 0x04
+#     icv_pre_calc = zlib.crc32(fragment_payload)
+#     new_fragment_payload = fragment_payload + icv_pre_calc.to_bytes(4, byteorder='little');
+#     new_fragment_payload = cipher.crypt(new_fragment_payload)
+#     arp.wepdata = new_fragment_payload[:-4]
+#     arp.icv = int.from_bytes(new_fragment_payload[-4:], 'big')
+#     # print(frag_no)
+#     print(hex(int.from_bytes(new_fragment_payload[:-4], byteorder='big')),
+#           hex(int.from_bytes(new_fragment_payload[-4:], byteorder='big')))
+#     fragements[frag_no] = arp.copy()
+#     frag_no += 1
+#     arp.SC += 1
+#
+#     pass
 # print(len(new_full_payload) / 4)
-fragements[nb_fragm-1].FCfield &= ~0x04
+# fragements[nb_fragm-1].FCfield &= ~0x04
 
 # Passé au fragement suivant
-arp.SC += 0
+# arp.SC += 0
 
 # Définit le bit more fragment à 1
-arp.FCfield |= 0x04;
+# arp.FCfield |= 0x04;
 
 
 # arp.wepdata = new_full_payload[:-4]

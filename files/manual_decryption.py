@@ -3,59 +3,54 @@
 
 """ Manually decrypt a wep message given the WEP key"""
 
-__author__      = "Abraham Rubinstein"
-__copyright__   = "Copyright 2017, HEIG-VD"
+__author__      = "Abraham Rubinstein, Cassandre Wojciechowski, Gabriel Roch"
+__copyright__   = "Copyright 2017, 2021, HEIG-VD"
 __license__ 	= "GPL"
-__version__ 	= "1.0"
+__version__ 	= "1.1"
 __email__ 		= "abraham.rubinstein@heig-vd.ch"
 __status__ 		= "Prototype"
 
 from scapy.all import *
-import binascii
+# import binascii
 from rc4 import RC4
 import zlib
 
-#Cle wep AA:AA:AA:AA:AA
+# Cle wep AA:AA:AA:AA:AA
 key= b'\xaa\xaa\xaa\xaa\xaa'
 
-#lecture de message chiffré - rdpcap retourne toujours un array, même si la capture contient un seul paquet
+# lecture de message chiffré - rdpcap retourne toujours un array, même si la capture contient un seul paquet
 arp = rdpcap('test.cap')[0]
 
 # rc4 seed est composé de IV+clé
 seed = arp.iv+key
 
 # recuperation de icv dans le message (arp.icv) (en chiffre) -- je passe au format "text". Il y a d'autres manières de faire ceci...
-print("arp.icv     ", hex(arp.icv))
 icv_encrypted='{:x}'.format(arp.icv)
-print("icv_enc     ", icv_encrypted)
+
 # text chiffré y-compris l'icv
 message_encrypted=arp.wepdata+bytes.fromhex(icv_encrypted)
 
 
 # déchiffrement rc4
 cipher = RC4(seed, streaming=False)
-print("seed:", seed)
-print("mess_encr", message_encrypted)
 cleartext = cipher.crypt(message_encrypted)
-print("payload: ", cleartext)
 
 # le ICV est les derniers 4 octets - je le passe en format Long big endian
 icv_enclair=cleartext[-4:]
-# print("target icv :", hex(zlib.crc32(cleartext[:-4])))
-# print("enclair icv:", icv_enclair)
-# print("payload : ", cleartext[:-4])
+icv_numerique=struct.unpack('!L', icv_enclair)
+
+# Verification de l'ICV
 if zlib.crc32(cleartext[:-4]).to_bytes(4, byteorder='little') == icv_enclair:
     print("ICV OK");
 else:
     print("ICV PAS OK");
-icv_numerique=struct.unpack('!L', icv_enclair)
 
 # le message sans le ICV
 text_enclair=cleartext[:-4]
 
-print ('Text: ' + text_enclair.hex())
-print ('Text: ' , text_enclair)
-print ('icv:  ' + icv_enclair.hex())
-print ('icv(num): ' + str(icv_numerique))
-print (icv_encrypted)
+print('Text: ' + text_enclair.hex())
+print('Text: ' , text_enclair)
+print('icv:  ' + icv_enclair.hex())
+print('icv(num): ' + str(icv_numerique))
+print(icv_encrypted)
 

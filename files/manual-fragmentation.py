@@ -39,18 +39,18 @@ message_encrypted=arp.wepdata+bytes.fromhex(icv_encrypted)
 # déchiffrement rc4
 cipher = RC4(seed, streaming=False)
 icv_pre_calc = zlib.crc32(new_payload)
-new_full_payload = new_payload+icv_pre_calc.to_bytes(4, byteorder='little');
-new_full_payload = cipher.crypt(new_full_payload)
+# new_full_payload = new_payload+icv_pre_calc.to_bytes(4, byteorder='little');
+# new_full_payload = cipher.crypt(new_full_payload)
 
 
-fragements = [0] * 4
-nb_fragm = 4
+nb_fragm = 2
+fragements = [0] * nb_fragm
 frag_no = 0
-for i in range(0, len(new_full_payload), int(len(new_full_payload)/nb_fragm)):
-    e = int(i+len(new_full_payload)/nb_fragm)
-    fragment_payload = new_full_payload[i:e]
+print(len(new_payload)/nb_fragm)
+for i in range(0, len(new_payload), int(len(new_payload)/nb_fragm)):
+    e = int(i+len(new_payload)/nb_fragm)
+    fragment_payload = new_payload[i:e]
 
-    arp.SC += 0
     arp.FCfield |= 0x04
     icv_pre_calc = zlib.crc32(fragment_payload)
     new_fragment_payload = fragment_payload + icv_pre_calc.to_bytes(4, byteorder='little');
@@ -62,9 +62,10 @@ for i in range(0, len(new_full_payload), int(len(new_full_payload)/nb_fragm)):
           hex(int.from_bytes(new_fragment_payload[-4:], byteorder='big')))
     fragements[frag_no] = arp.copy()
     frag_no += 1
+    arp.SC += 1
 
     pass
-print(len(new_full_payload) / 4)
+# print(len(new_full_payload) / 4)
 fragements[nb_fragm-1].FCfield &= ~0x04
 
 # Passé au fragement suivant
@@ -74,8 +75,8 @@ arp.SC += 0
 arp.FCfield |= 0x04;
 
 
-arp.wepdata = new_full_payload[:-4]
-arp.icv = int.from_bytes(new_full_payload[-4:], 'big');
+# arp.wepdata = new_full_payload[:-4]
+# arp.icv = int.from_bytes(new_full_payload[-4:], 'big');
 # cleartext = cipher.crypt(message_encrypted)
 #
 # le ICV est les derniers 4 octets - je le passe en format Long big endian

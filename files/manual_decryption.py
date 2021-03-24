@@ -3,15 +3,14 @@
 
 """ Manually decrypt a wep message given the WEP key"""
 
-__author__      = "Abraham Rubinstein, Cassandre Wojciechowski, Gabriel Roch"
-__copyright__   = "Copyright 2017, 2021, HEIG-VD"
-__license__ 	= "GPL"
-__version__ 	= "1.1"
-__email__ 		= "abraham.rubinstein@heig-vd.ch"
-__status__ 		= "Prototype"
+__author__ = "Abraham Rubinstein, Cassandre Wojciechowski, Gabriel Roch"
+__copyright__ = "Copyright 2017, 2021, HEIG-VD"
+__license__ = "GPL"
+__version__ = "1.1"
+__email__ = "abraham.rubinstein@heig-vd.ch"
+__status__ = "Prototype"
 
 from scapy.all import *
-# import binascii
 from rc4 import RC4
 import zlib
 

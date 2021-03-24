@@ -49,7 +49,7 @@ def ieee_gen(payload, key):
     arp.icv = int.from_bytes(payload_with_icv[-4:], 'big')
 
     # Remets la taille du paquet à zéro.
-    arp.[RadioTap].len = None
+    arp[RadioTap].len = None
 
     return arp
 
